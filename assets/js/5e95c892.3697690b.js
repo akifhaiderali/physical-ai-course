@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkphysical_ai_robotics_course=self.webpackChunkphysical_ai_robotics_course||[]).push([[647],{7121:(s,e,r)=>{r.r(e),r.d(e,{default:()=>l});r(6540);var c=r(4164),a=r(7559),u=r(5500),i=r(2831),o=r(1656),t=r(4848);function l(s){return(0,t.jsx)(u.e3,{className:(0,c.A)(a.G.wrapper.docsPages),children:(0,t.jsx)(o.A,{children:(0,i.v)(s.route.routes)})})}}}]);

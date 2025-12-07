@@ -1,0 +1,122 @@
+/**
+ * Custom CSS for Physical AI & Humanoid Robotics Course
+ * Academic styling for educational content
+ */
+
+:root {
+  --ifm-color-primary: #2e8555;
+  --ifm-color-primary-dark: #29784c;
+  --ifm-color-primary-darker: #277148;
+  --ifm-color-primary-darkest: #205d3b;
+  --ifm-color-primary-light: #33925d;
+  --ifm-color-primary-lighter: #359962;
+  --ifm-color-primary-lightest: #3cad6e;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #25c2a0;
+  --ifm-color-primary-dark: #21af90;
+  --ifm-color-primary-darker: #1fa588;
+  --ifm-color-primary-darkest: #1a8870;
+  --ifm-color-primary-light: #29d5b0;
+  --ifm-color-primary-lighter: #32d8b4;
+  --ifm-color-primary-lightest: #4fddbf;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+/* Academic styling */
+.markdown {
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.markdown h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--ifm-color-primary);
+  padding-bottom: 0.5rem;
+}
+
+.markdown h2 {
+  font-size: 2rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--ifm-color-primary-dark);
+}
+
+.markdown h3 {
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Learning objectives styling */
+.markdown h2:contains('Learning Objectives'),
+.markdown h2:contains('Objectives') {
+  color: var(--ifm-color-primary);
+}
+
+/* Code examples */
+.markdown pre {
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Tables for lab specifications */
+.markdown table {
+  display: table;
+  width: 100%;
+  margin: 1.5rem 0;
+  border-collapse: collapse;
+}
+
+.markdown th {
+  background-color: var(--ifm-color-primary-lightest);
+  font-weight: 600;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.markdown td {
+  padding: 0.75rem;
+  border: 1px solid var(--ifm-table-border-color);
+}
+
+/* Citations and references */
+.markdown sup {
+  font-size: 0.75em;
+}
+
+/* Blockquotes for important notes */
+.markdown blockquote {
+  border-left: 4px solid var(--ifm-color-primary);
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  background-color: rgba(46, 133, 85, 0.05);
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+/* Admonitions for exercises and examples */
+.admonition {
+  margin: 1.5rem 0;
+}
+
+/* Image captions */
+.markdown img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 1rem 0;
+}
+
+/* Footer styling */
+.footer {
+  background-color: var(--ifm-color-primary-darkest);
+  color: white;
+}

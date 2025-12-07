@@ -1,0 +1,306 @@
+# YAML Schema for Exercise Chapter Frontmatter
+# Used to validate all exercise files in docs/exercises/
+# Enforcement: Pre-commit hooks and CI/CD validation
+
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: "https://github.com/your-organization/physical-ai-course/schemas/exercise-schema.yaml"
+title: "Exercise Chapter Frontmatter Schema"
+description: "Validation schema for hands-on exercise YAML frontmatter in Physical AI course"
+type: object
+
+required:
+  - id
+  - title
+  - sidebar_position
+  - module
+  - duration
+  - difficulty
+  - prerequisites
+  - learning_outcomes
+  - equipment_required
+  - assessment_criteria
+  - last_updated
+
+properties:
+  id:
+    type: string
+    description: "Unique exercise identifier (kebab-case, matches filename without .md)"
+    pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+    examples:
+      - "ros2-talker-listener"
+      - "gazebo-urdf-modeling"
+      - "isaac-synthetic-data"
+
+  title:
+    type: string
+    description: "Display title for exercise (Title Case with exercise number)"
+    minLength: 10
+    maxLength: 120
+    pattern: "^Exercise \\d+\\.\\d+:.*$"
+    examples:
+      - "Exercise 1.1: Building a ROS 2 Talker-Listener System"
+      - "Exercise 2.2: Creating Custom Robot Models in Gazebo"
+
+  sidebar_position:
+    type: integer
+    description: "Order in exercises sidebar (1-indexed)"
+    minimum: 1
+    maximum: 50
+
+  module:
+    type: integer
+    description: "Related module number (1-4)"
+    enum: [1, 2, 3, 4]
+
+  duration:
+    type: integer
+    description: "Estimated completion time in minutes (30-180)"
+    minimum: 30
+    maximum: 180
+
+  difficulty:
+    type: string
+    description: "Difficulty level for students"
+    enum: ["beginner", "intermediate", "advanced"]
+
+  prerequisites:
+    type: array
+    description: "List of prerequisite exercise IDs (empty array if none)"
+    items:
+      type: string
+      pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+    examples:
+      - []
+      - ["ros2-talker-listener"]
+      - ["gazebo-urdf-modeling", "ros2-navigation"]
+
+  learning_outcomes:
+    type: array
+    description: "Measurable learning outcomes (2-3 per exercise)"
+    minItems: 2
+    maxItems: 3
+    items:
+      type: string
+      minLength: 20
+      maxLength: 200
+      pattern: "^(Create|Build|Implement|Deploy|Test|Validate|Configure|Design|Demonstrate|Execute|Modify|Debug|Troubleshoot|Measure|Compare|Integrate).*$"
+    examples:
+      - "Create ROS 2 publisher and subscriber nodes in Python"
+      - "Validate URDF robot models using Gazebo physics simulation"
+
+  equipment_required:
+    type: object
+    description: "Hardware and software requirements"
+    required:
+      - hardware
+      - software
+    properties:
+      hardware:
+        type: array
+        description: "Physical equipment needed"
+        minItems: 1
+        items:
+          type: string
+        examples:
+          - "Ubuntu 22.04 workstation or VM"
+          - "NVIDIA GPU (RTX 2060 or better)"
+          - "Unitree H1 humanoid robot"
+
+      software:
+        type: array
+        description: "Software dependencies"
+        minItems: 1
+        items:
+          type: string
+        examples:
+          - "ROS 2 Humble"
+          - "Python 3.10+"
+          - "NVIDIA Isaac Sim 2023.1.1"
+
+  code_examples:
+    type: array
+    description: "Optional list of code files provided with exercise"
+    items:
+      type: object
+      required:
+        - path
+        - description
+      properties:
+        path:
+          type: string
+          description: "Relative path to code file from project root"
+          pattern: "^static/code-examples/.*$"
+        description:
+          type: string
+          description: "Brief description of code file purpose"
+          minLength: 10
+          maxLength: 200
+    examples:
+      - path: "static/code-examples/module1-ros2/talker.py"
+        description: "Publisher node sending string messages"
+      - path: "static/code-examples/module1-ros2/listener.py"
+        description: "Subscriber node receiving messages"
+
+  assessment_criteria:
+    type: array
+    description: "Grading rubric with weighted criteria"
+    minItems: 2
+    maxItems: 6
+    items:
+      type: object
+      required:
+        - criterion
+        - weight
+        - description
+      properties:
+        criterion:
+          type: string
+          description: "Name of assessment criterion"
+          minLength: 5
+          maxLength: 100
+          examples:
+            - "Nodes compile and run without errors"
+            - "Correct topic communication"
+            - "Code quality and documentation"
+
+        weight:
+          type: integer
+          description: "Percentage weight (all criteria must sum to 100%)"
+          minimum: 5
+          maximum: 50
+
+        description:
+          type: string
+          description: "Detailed description of criterion"
+          minLength: 10
+          maxLength: 300
+
+  last_updated:
+    type: string
+    description: "ISO 8601 date of last update (YYYY-MM-DD)"
+    format: "date"
+    pattern: "^\\d{4}-\\d{2}-\\d{2}$"
+
+  tags:
+    type: array
+    description: "Optional searchable tags"
+    items:
+      type: string
+    examples:
+      - "ROS2"
+      - "navigation"
+      - "URDF"
+      - "VLA"
+
+# Validation Examples
+
+examples:
+  - id: "ros2-talker-listener"
+    title: "Exercise 1.1: Building a ROS 2 Talker-Listener System"
+    sidebar_position: 1
+    module: 1
+    duration: 60
+    difficulty: "beginner"
+    prerequisites: []
+    learning_outcomes:
+      - "Create ROS 2 publisher and subscriber nodes in Python"
+      - "Verify topic communication using ROS 2 CLI tools"
+    equipment_required:
+      hardware:
+        - "Ubuntu 22.04 workstation or VM"
+      software:
+        - "ROS 2 Humble"
+        - "Python 3.10+"
+    code_examples:
+      - path: "static/code-examples/module1-ros2/talker.py"
+        description: "Publisher node sending string messages"
+      - path: "static/code-examples/module1-ros2/listener.py"
+        description: "Subscriber node receiving messages"
+    assessment_criteria:
+      - criterion: "Nodes compile and run without errors"
+        weight: 30
+        description: "Both talker and listener execute successfully"
+      - criterion: "Correct topic communication"
+        weight: 40
+        description: "Listener receives messages published by talker"
+      - criterion: "Code quality and documentation"
+        weight: 30
+        description: "Code follows PEP 8 and includes docstrings"
+    last_updated: "2025-12-07"
+    tags: ["ROS2", "publisher", "subscriber", "Python"]
+
+  - id: "isaac-synthetic-data"
+    title: "Exercise 3.1: Generating Synthetic Training Data with Isaac Sim"
+    sidebar_position: 7
+    module: 3
+    duration: 120
+    difficulty: "advanced"
+    prerequisites:
+      - "gazebo-urdf-modeling"
+      - "ros2-navigation"
+    learning_outcomes:
+      - "Implement domain randomization for texture and lighting variation"
+      - "Generate 1000+ labeled RGB-D images for object detection training"
+    equipment_required:
+      hardware:
+        - "Ubuntu 22.04 workstation with NVIDIA GPU (RTX 3060 or better)"
+      software:
+        - "NVIDIA Isaac Sim 2023.1.1"
+        - "NVIDIA Omniverse Nucleus (local or cloud)"
+        - "Python 3.10+"
+    code_examples:
+      - path: "static/code-examples/module3-isaac/synthetic_data_generation.py"
+        description: "Script for automated synthetic data generation with domain randomization"
+      - path: "static/code-examples/module3-isaac/domain_randomization.py"
+        description: "Utility functions for randomizing materials, lighting, and camera poses"
+    assessment_criteria:
+      - criterion: "Data generation pipeline executes without errors"
+        weight: 25
+        description: "Script successfully generates 1000+ images with annotations"
+      - criterion: "Domain randomization implementation"
+        weight: 35
+        description: "Textures, lighting, and object poses vary across dataset"
+      - criterion: "Data quality and labeling accuracy"
+        weight: 25
+        description: "Bounding boxes correctly annotate objects in RGB images"
+      - criterion: "Documentation and analysis"
+        weight: 15
+        description: "Report includes dataset statistics and sample visualizations"
+    last_updated: "2025-12-07"
+    tags: ["Isaac Sim", "synthetic data", "domain randomization", "computer vision"]
+
+# Custom Validation Rules (not enforced by JSON Schema, must be checked in CI)
+
+# 1. File naming: <id>.md must match frontmatter 'id' field
+# 2. Assessment weights: Sum of all 'assessment_criteria.weight' must equal 100%
+# 3. Code paths: All 'code_examples.path' files must exist in repository
+# 4. Prerequisites: All 'prerequisites' IDs must exist in docs/exercises/
+# 5. Exercise numbering: Title must follow "Exercise M.N:" format where M=module, N=sequence
+# 6. Duration realism: Estimated 'duration' should align with exercise complexity and difficulty
+# 7. Learning outcome verbs: Must start with measurable action verbs (Create, Build, Implement, etc.)
+
+# Usage in CI/CD:
+# - Pre-commit hook: Validate frontmatter against this schema before allowing commit
+# - GitHub Actions: Run schema validation on all docs/exercises/*.md files
+# - Custom validator: Check assessment_criteria weights sum to 100%
+# - Custom validator: Verify all code_examples.path files exist
+
+# Example Validation Script (Python):
+# ```python
+# import yaml
+# import jsonschema
+# from pathlib import Path
+#
+# schema = yaml.safe_load(Path("exercise-schema.yaml").read_text())
+# for exercise_file in Path("docs/exercises").glob("*.md"):
+#     frontmatter = extract_frontmatter(exercise_file)
+#     jsonschema.validate(instance=frontmatter, schema=schema)
+#
+#     # Custom validation: assessment weights sum to 100
+#     total_weight = sum(c['weight'] for c in frontmatter['assessment_criteria'])
+#     assert total_weight == 100, f"Assessment weights must sum to 100%, got {total_weight}%"
+#
+#     # Custom validation: code files exist
+#     for code in frontmatter.get('code_examples', []):
+#         assert Path(code['path']).exists(), f"Code file not found: {code['path']}"
+# ```

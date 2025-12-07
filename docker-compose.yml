@@ -1,0 +1,161 @@
+# Docker Compose for Physical AI Course Code Example Testing
+# Provides isolated, reproducible test environments for each module
+# Usage: docker-compose up <service-name>
+
+version: '3.8'
+
+services:
+  # ROS 2 Testing Environment (Module 1)
+  # Tests: ROS 2 nodes, topics, services, Nav2 examples
+  ros2-test:
+    image: osrf/ros:humble-desktop-full
+    container_name: physical-ai-ros2-test
+    environment:
+      - DISPLAY=${DISPLAY:-:0}
+      - ROS_DOMAIN_ID=42
+    volumes:
+      - ./static/code-examples/module1-ros2:/workspace/code
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    working_dir: /workspace/code
+    command: bash -c "source /opt/ros/humble/setup.bash && bash"
+    networks:
+      - robotics-net
+    stdin_open: true
+    tty: true
+
+  # Gazebo Simulation Testing (Module 2)
+  # Tests: Gazebo world files, robot models, SDF/URDF validation
+  gazebo-test:
+    image: osrf/ros:humble-desktop-full
+    container_name: physical-ai-gazebo-test
+    environment:
+      - DISPLAY=${DISPLAY:-:0}
+      - GAZEBO_MODEL_PATH=/workspace/models
+    volumes:
+      - ./static/code-examples/module2-simulation:/workspace/code
+      - ./static/code-examples/module2-simulation/models:/workspace/models
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    working_dir: /workspace/code
+    command: bash -c "source /opt/ros/humble/setup.bash && bash"
+    networks:
+      - robotics-net
+    stdin_open: true
+    tty: true
+
+  # Unity Simulation Testing (Module 2)
+  # Tests: Unity scripts, robot controller validation
+  # Note: Limited headless testing; full Unity requires manual validation
+  unity-test:
+    image: gableroux/unity3d:2022.3.10f1-ubuntu
+    container_name: physical-ai-unity-test
+    environment:
+      - UNITY_LICENSE_FILE=/workspace/unity-license.ulf
+    volumes:
+      - ./static/code-examples/module2-simulation/unity:/workspace/unity-project
+    working_dir: /workspace/unity-project
+    command: bash -c "echo 'Unity test container ready. Run Unity Editor manually for full validation.'"
+    networks:
+      - robotics-net
+    stdin_open: true
+    tty: true
+
+  # NVIDIA Isaac Sim Testing (Module 3)
+  # Tests: Isaac Sim scripts, synthetic data generation, domain randomization
+  # Note: Requires NVIDIA GPU and Omniverse installation
+  isaac-sim-test:
+    image: nvcr.io/nvidia/isaac-sim:2023.1.1
+    container_name: physical-ai-isaac-test
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - DISPLAY=${DISPLAY:-:0}
+    volumes:
+      - ./static/code-examples/module3-isaac:/workspace/code
+      - ~/.nvidia-omniverse:/root/.nvidia-omniverse
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    working_dir: /workspace/code
+    command: bash -c "echo 'Isaac Sim test container ready. Requires Omniverse Nucleus connection.'"
+    networks:
+      - robotics-net
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # VLA (Vision-Language-Action) Testing (Module 4)
+  # Tests: OpenVLA, RT-1, RT-2 inference scripts, multimodal pipelines
+  vla-test:
+    image: pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime
+    container_name: physical-ai-vla-test
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - TRANSFORMERS_CACHE=/workspace/.cache/huggingface
+    volumes:
+      - ./static/code-examples/module4-vla:/workspace/code
+      - ./static/code-examples/module4-vla/models:/workspace/models
+      - ~/.cache/huggingface:/workspace/.cache/huggingface
+    working_dir: /workspace/code
+    command: bash -c "pip install transformers openvla-lib && python --version && bash"
+    networks:
+      - robotics-net
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # Capstone Integration Testing
+  # Tests: Full-stack integration of ROS 2 + VLA + Isaac Sim
+  capstone-test:
+    image: nvcr.io/nvidia/isaac-sim:2023.1.1
+    container_name: physical-ai-capstone-test
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - ROS_DOMAIN_ID=42
+      - DISPLAY=${DISPLAY:-:0}
+    volumes:
+      - ./static/code-examples/capstone:/workspace/code
+      - ~/.nvidia-omniverse:/root/.nvidia-omniverse
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    working_dir: /workspace/code
+    command: bash -c "source /opt/ros/humble/setup.bash && bash"
+    networks:
+      - robotics-net
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+networks:
+  robotics-net:
+    driver: bridge
+
+# Testing Instructions:
+# 1. ROS 2 Examples: docker-compose run ros2-test
+# 2. Gazebo Examples: docker-compose run gazebo-test
+# 3. Unity Examples: docker-compose run unity-test (manual validation required)
+# 4. Isaac Sim Examples: docker-compose run isaac-sim-test (requires GPU + Omniverse)
+# 5. VLA Examples: docker-compose run vla-test (requires GPU)
+# 6. Capstone Examples: docker-compose run capstone-test (requires GPU + Omniverse)
+
+# CI/CD Integration:
+# - GitHub Actions runs headless tests for ROS 2, Gazebo, VLA
+# - Isaac Sim and Unity require manual validation due to GPU/license requirements
+# - Mock hardware APIs with reasonable defaults for CI testing

@@ -1,0 +1,184 @@
+# YAML Schema for Module Chapter Frontmatter
+# Used to validate all chapter files in docs/modules/
+# Enforcement: Pre-commit hooks and CI/CD validation
+
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: "https://github.com/your-organization/physical-ai-course/schemas/chapter-schema.yaml"
+title: "Module Chapter Frontmatter Schema"
+description: "Validation schema for module chapter YAML frontmatter in Physical AI course"
+type: object
+
+required:
+  - id
+  - title
+  - sidebar_position
+  - module
+  - learning_objectives
+  - word_count
+  - last_updated
+
+properties:
+  id:
+    type: string
+    description: "Unique chapter identifier (kebab-case, matches filename without .md)"
+    pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+    examples:
+      - "ros2-fundamentals"
+      - "gazebo-simulation"
+      - "isaac-sim-synthetic-data"
+
+  title:
+    type: string
+    description: "Display title for chapter (Title Case)"
+    minLength: 5
+    maxLength: 100
+    examples:
+      - "ROS 2 Fundamentals"
+      - "Gazebo Simulation and Robot Modeling"
+
+  sidebar_position:
+    type: integer
+    description: "Order in sidebar navigation (1-indexed)"
+    minimum: 1
+    maximum: 100
+
+  module:
+    type: integer
+    description: "Module number (1-4)"
+    enum: [1, 2, 3, 4]
+
+  learning_objectives:
+    type: array
+    description: "Measurable learning outcomes using Bloom's taxonomy verbs"
+    minItems: 3
+    maxItems: 5
+    items:
+      type: string
+      minLength: 20
+      maxLength: 200
+      pattern: "^(Design|Implement|Explain|Analyze|Evaluate|Create|Apply|Demonstrate|Build|Configure|Deploy|Test|Debug|Compare|Optimize|Integrate|Validate).*$"
+    examples:
+      - "Design multi-node ROS 2 systems using publishers and subscribers"
+      - "Implement custom ROS 2 services for request-response communication"
+      - "Explain the DDS middleware architecture underlying ROS 2"
+
+  related_exercises:
+    type: array
+    description: "Optional list of exercise IDs linked to this chapter"
+    items:
+      type: string
+      pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+    examples:
+      - "ros2-talker-listener"
+      - "gazebo-urdf-modeling"
+
+  related_references:
+    type: array
+    description: "Optional BibTeX citation keys for sources cited in chapter"
+    items:
+      type: string
+      pattern: "^[A-Za-z0-9_]+$"
+    examples:
+      - "Macenski2020"
+      - "Quigley2015"
+      - "Brohan2023"
+
+  word_count:
+    type: integer
+    description: "Target word count for chapter body (800-1500 words per constitution)"
+    minimum: 800
+    maximum: 1500
+
+  last_updated:
+    type: string
+    description: "ISO 8601 date of last update (YYYY-MM-DD)"
+    format: "date"
+    pattern: "^\\d{4}-\\d{2}-\\d{2}$"
+    examples:
+      - "2025-12-07"
+
+  tags:
+    type: array
+    description: "Optional searchable tags for content discovery"
+    items:
+      type: string
+    examples:
+      - "ROS2"
+      - "navigation"
+      - "simulation"
+      - "VLA"
+
+  difficulty:
+    type: string
+    description: "Optional difficulty indicator"
+    enum: ["beginner", "intermediate", "advanced"]
+
+# Validation Examples
+
+examples:
+  - id: "ros2-fundamentals"
+    title: "ROS 2 Fundamentals"
+    sidebar_position: 1
+    module: 1
+    learning_objectives:
+      - "Design multi-node ROS 2 systems using publishers and subscribers"
+      - "Implement custom ROS 2 services for request-response communication"
+      - "Explain the DDS middleware architecture underlying ROS 2"
+    related_exercises:
+      - "ros2-talker-listener"
+      - "ros2-custom-service"
+    related_references:
+      - "Macenski2020"
+      - "Quigley2015"
+    word_count: 1200
+    last_updated: "2025-12-07"
+    tags: ["ROS2", "middleware", "DDS"]
+    difficulty: "beginner"
+
+  - id: "isaac-sim-domain-randomization"
+    title: "Domain Randomization in NVIDIA Isaac Sim"
+    sidebar_position: 6
+    module: 3
+    learning_objectives:
+      - "Implement domain randomization techniques for sim-to-real transfer"
+      - "Generate synthetic training datasets with varied lighting and textures"
+      - "Evaluate policy generalization across randomized environments"
+    related_exercises:
+      - "isaac-synthetic-data-generation"
+    related_references:
+      - "Tobin2017"
+      - "NVIDIAIsaacSim2023"
+    word_count: 1350
+    last_updated: "2025-12-07"
+    tags: ["Isaac Sim", "synthetic data", "domain randomization"]
+    difficulty: "advanced"
+
+# Validation Rules (not enforced by JSON Schema, must be checked in CI)
+
+# Custom Validation Rules:
+# 1. File naming: <id>.md must match frontmatter 'id' field
+# 2. Citation keys: All 'related_references' must exist in static/references.bib
+# 3. Exercise links: All 'related_exercises' must exist in docs/exercises/
+# 4. Word count accuracy: Actual markdown body word count should be within ±10% of 'word_count' field
+# 5. Learning objective verbs: Must start with Bloom's taxonomy action verbs (Design, Implement, Explain, etc.)
+# 6. Module consistency: All chapters with same 'module' number should be in same directory
+
+# Usage in CI/CD:
+# - Pre-commit hook: Validate frontmatter against this schema before allowing commit
+# - GitHub Actions: Run schema validation on all docs/modules/**/*.md files
+# - Docusaurus build: Fail build if any chapter fails validation
+
+# Validation Command (using yq or similar):
+# yq eval-all '. as $doc | load("chapter-schema.yaml") | $doc' chapter.md
+
+# Example Validation Script (Python):
+# ```python
+# import yaml
+# import jsonschema
+# from pathlib import Path
+#
+# schema = yaml.safe_load(Path("chapter-schema.yaml").read_text())
+# for chapter_file in Path("docs/modules").rglob("*.md"):
+#     frontmatter = extract_frontmatter(chapter_file)
+#     jsonschema.validate(instance=frontmatter, schema=schema)
+# ```

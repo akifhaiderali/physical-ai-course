@@ -3,5 +3,8 @@
 
 set -o errexit
 
-pip install --upgrade pip
-pip install -r requirements.txt
+echo "=== Installing Python dependencies ==="
+pip install --upgrade pip setuptools wheel
+pip install -r requirements.txt --no-cache-dir
+
+echo "=== Build complete ==="

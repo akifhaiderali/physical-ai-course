@@ -7,6 +7,11 @@
 import React from 'react';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 
+// Backend URL configuration
+const BACKEND_URL = typeof window !== 'undefined' && window.location.hostname === 'akifhaiderali.github.io'
+  ? 'https://physical-ai-backend-nn2w.onrender.com'
+  : 'http://localhost:8000';
+
 // Functional chatbot component with backend integration
 function SimpleChatbot() {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -23,7 +28,7 @@ function SimpleChatbot() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/chat/query', {
+      const response = await fetch(`${BACKEND_URL}/api/v1/chat/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: input, mode: 'full-book' }),
@@ -39,7 +44,7 @@ function SimpleChatbot() {
     } catch (error) {
       setMessages(prev => [...prev, {
         role: 'system',
-        content: 'Error: Could not connect to backend. Make sure http://localhost:8000 is running.',
+        content: `Error: Could not connect to backend (${BACKEND_URL}). The server may be starting up. Please wait 30 seconds and try again.`,
         id: Date.now() + 1
       }]);
     } finally {

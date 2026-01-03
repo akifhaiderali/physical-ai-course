@@ -45,7 +45,8 @@ class Settings(BaseSettings):
     api_port: int = 8000
     api_cors_origins: List[str] = [
         "http://localhost:3000",
-        "http://localhost:3001"
+        "http://localhost:3001",
+        "https://akifhaiderali.github.io"
     ]
 
     # =====================
